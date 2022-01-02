@@ -15,7 +15,7 @@ const songs = [
     },
     {
         name: "Something Just Like This",
-        singer: "Shalom Margaret",
+        singer: "The Chainsmokers & Coldplayt",
         path: "./assets/songs/song3.mp3",
         thumb: "./assets/images/s3.jpg"
     },
@@ -176,9 +176,11 @@ handleEvent() {
     }
     //Xử lý sự kiện khi play ,tua
     audio.ontimeupdate = function(){
-       
+        if (audio.duration){
         const progressPercent =Math.floor((audio.currentTime/audio.duration)*100);
          progress.value =progressPercent;
+        }
+        
 
     }
     progress.oninput = function(){
