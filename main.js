@@ -15,7 +15,7 @@ const songs = [
     },
     {
         name: "Something Just Like This",
-        singer: "The Chainsmokers & Coldplayt",
+        singer: "The Chainsmokers & Coldplay",
         path: "./assets/songs/song3.mp3",
         thumb: "./assets/images/s3.jpg"
     },
@@ -58,7 +58,7 @@ const pauseBtn = $(" .control .icon-pause ")
 const playlist =  $(".playlist") 
 const toggleplayBtn = $(".btn.btn-toggle-play")
 let progress = $("#progress") 
- 
+const PLAYER_STORAGE = "my-player" 
 const randomBtn = $(".control .btn-random") 
 
 
@@ -68,11 +68,17 @@ const app = {
     isRandom: false,
     isRepeat: false,
     currentIndex: 0,
+    // userConfig = (JSON.parse(localStorage.getItem("PLAYER_STORAGE"))) || {}
+    // , setConfig(key,value) {
+    //     config[key] =value;
+
+    // }
     renderPlaylist() {
         progress.value = 0
-     const htmls= songs.map(song=> {
-          
-        return `<div class="song">
+      
+     const htmls= songs.map((song,index)=> {
+      
+        return `<div class="song" data-id="${index}">
             <div class="thumb"
             style="background-image: url('${song.thumb}')">
             </div>
@@ -104,14 +110,27 @@ const app = {
         progress.value =0;
         let songActive = document.querySelector(".song.active");
         if (songActive)  songActive.classList.remove("active");
+       
         let element = document.querySelectorAll(".song")[this.currentIndex];
         if(element) element.classList.add("active")
+        
         audio.currentTime=0;
        
         header.textContent = this.currentSong.name
         cdThumb.style.backgroundImage = `url("${this.currentSong.thumb}")`
- 
+     
         audio.src = this.currentSong.path;
+        if($(".song.active")) {
+            let active = $(".song.active")
+            if(active.dataset.id<=(songs.length-1)/3){
+                setTimeout(function(){
+                    active.scrollIntoView({behavior: "smooth", block: "end"});
+                },1000)
+            }
+            else setTimeout(function(){
+                active.scrollIntoView({behavior: "smooth", block: "start"});
+            },1000)
+        }
        
     },
     handleclickSong() {
@@ -119,16 +138,24 @@ const app = {
         let songItems = document.querySelectorAll(".song");
       
         songItems.forEach((element,index) => {
-            element.onclick = function() {
+            element.onclick = function(e) {
              
                
-                if(index) _this.currentIndex=index;
-                _this.currentIndex=index;
+                if( !e.target.closest(".option")) {
+                    _this.currentIndex=index;
+                    _this.loadCurrentSong();
+                    audio.play()}
+                // else if(e.target.closest(".option")){
+                //     let option = document.createElement("div");
+                //     option.classList.add(".option-popup")
+                
+                //     element.appendChild(option)
+                // }
             
-               _this.loadCurrentSong();
+          
             
               
-                audio.play()
+               
               
             }
         });
@@ -205,7 +232,7 @@ handleEvent() {
         }
         _this.loadCurrentSong();
         audio.play();
-        
+     
     },   
     prevBtn.onclick = function(){
         if(_this.isRandom){
@@ -218,7 +245,7 @@ handleEvent() {
         }
         _this.loadCurrentSong();
         audio.play();
-     
+        
   
     },
     randomBtn.onclick = function(){
@@ -260,6 +287,7 @@ handleEvent() {
         while(newIndex === this.currentIndex)
         this.currentIndex=newIndex;
     },
+   
     start() {
         // Định nghĩa thuộc tích
         this.defineProperties();
@@ -271,5 +299,6 @@ handleEvent() {
         this.handleclickSong();
       
     }
+    
 }
 app.start();
